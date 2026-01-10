@@ -209,56 +209,6 @@ struct WordContentRow: View {
     }
 }
 
-// Compact row for bingos (7-letter words) - displayed horizontally
-struct BingoWordCell: View {
-    let word: String
-    let wasFound: Bool
-    let inkColor = Color(red: 0.17, green: 0.17, blue: 0.17)
-
-    var body: some View {
-        HStack(spacing: 4) {
-            Image(systemName: wasFound ? "checkmark.circle.fill" : "circle")
-                .font(.system(size: 14))
-                .foregroundColor(wasFound ? Color(red: 0.2, green: 0.5, blue: 0.3) : inkColor.opacity(0.4))
-
-            Text(word)
-                .font(.custom("Courier", size: 15).bold())
-                .foregroundColor(wasFound ? inkColor : inkColor.opacity(0.5))
-        }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-    }
-}
-
-struct BingoDefinitionRow: View {
-    let word: String
-    let definition: String
-    let wasFound: Bool
-    let rowIndex: Int
-    let inkColor = Color(red: 0.17, green: 0.17, blue: 0.17)
-    let greenBarColor = Color(red: 0.88, green: 0.95, blue: 0.89)
-
-    var body: some View {
-        HStack(alignment: .top, spacing: 8) {
-            Text(word)
-                .font(.custom("Courier", size: 15).bold())
-                .foregroundColor(wasFound ? inkColor : inkColor.opacity(0.5))
-                .frame(width: 85, alignment: .leading)
-
-            Text(definition)
-                .font(.custom("Courier", size: 14))
-                .foregroundColor(inkColor.opacity(0.85))
-                .fixedSize(horizontal: false, vertical: true)
-
-            Spacer()
-        }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 4)
-        .frame(maxWidth: .infinity)
-        .background(rowIndex % 2 == 0 ? greenBarColor : Color.white)
-    }
-}
-
 struct EmptyContentRow: View {
     let rowIndex: Int
     let lineHeight: CGFloat
@@ -376,42 +326,15 @@ struct DefinitionsWindow: View {
                             SectionTitleContentRow(title: "\(length)-LETTER WORDS (\(entries.count))", rowIndex: sectionStartRow + 1)
                         }
 
-                        if length == 7 {
-                            // BINGOS: Display words horizontally, then definitions below
-                            // Row with all bingo words left to right
-                            WordRowWithSprockets(rowIndex: sectionStartRow + 2) {
-                                HStack(spacing: 0) {
-                                    ForEach(entries) { entry in
-                                        BingoWordCell(word: entry.word, wasFound: entry.wasFound)
-                                    }
-                                    Spacer()
-                                }
-                                .frame(maxWidth: .infinity)
-                                .background(Color(red: 0.88, green: 0.95, blue: 0.89))
-                            }
-
-                            // Then definitions for each bingo
-                            ForEach(Array(entries.enumerated()), id: \.element.id) { entryIndex, entry in
-                                WordRowWithSprockets(rowIndex: sectionStartRow + 3 + entryIndex) {
-                                    BingoDefinitionRow(
-                                        word: entry.word,
-                                        definition: entry.definition,
-                                        wasFound: entry.wasFound,
-                                        rowIndex: sectionStartRow + 3 + entryIndex
-                                    )
-                                }
-                            }
-                        } else {
-                            // Regular words: vertical list with word + definition
-                            ForEach(Array(entries.enumerated()), id: \.element.id) { entryIndex, entry in
-                                WordRowWithSprockets(rowIndex: sectionStartRow + 2 + entryIndex) {
-                                    WordContentRow(
-                                        word: entry.word,
-                                        definition: entry.definition,
-                                        wasFound: entry.wasFound,
-                                        rowIndex: sectionStartRow + 2 + entryIndex
-                                    )
-                                }
+                        // All words: vertical list with word + checkbox + definition
+                        ForEach(Array(entries.enumerated()), id: \.element.id) { entryIndex, entry in
+                            WordRowWithSprockets(rowIndex: sectionStartRow + 2 + entryIndex) {
+                                WordContentRow(
+                                    word: entry.word,
+                                    definition: entry.definition,
+                                    wasFound: entry.wasFound,
+                                    rowIndex: sectionStartRow + 2 + entryIndex
+                                )
                             }
                         }
                     }
