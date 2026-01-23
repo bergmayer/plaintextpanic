@@ -35,8 +35,9 @@ PlaintextPanic.dmg
 # Python virtual environment (for icon generation script)
 .venv/
 
-# Original uncompressed word lists (not for distribution - compressed versions are in app)
+# Word lists (licensed content - not included in repository)
 /wordlists/
+PlaintextPanic/Resources/WordLists/*.gz
 
 # Local build scripts (not for distribution)
 /build-and-run-debug.sh
