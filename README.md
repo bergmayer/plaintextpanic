@@ -21,9 +21,17 @@ Requires Xcode with macOS SDK.
 ./build.sh run      # Build debug and launch
 ```
 
-## Word List
+## Word Lists
 
-This game uses word lists from the North American SCRABBLE Players Association (NASPA).
+This game uses word lists from the North American SCRABBLE Players Association (NASPA). Two word list options are available from the menu:
+
+**Full NASPA Word List** (default)
+All valid tournament words from the NASPA Word List 2023. Includes 25,473 possible 7-letter starting words.
+
+**Common 7-Letter Words**
+Uses only common, recognizable 7-letter words (5,060 words) while keeping all 3-6 letter words playable. Good for casual play.
+
+---
 
 **NASPA Word List 2023 Edition**
 **© NASPA 2025**

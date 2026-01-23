@@ -19,9 +19,8 @@
 		A1000001233F000F1 /* CRTDistortion.metal in Sources */ = {isa = PBXBuildFile; fileRef = A1000001233F000F0 /* CRTDistortion.metal */; };
 		A1000001233F00008 /* PrintChar21.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F00080 /* PrintChar21.ttf */; };
 		A1000001233F00009 /* PRNumber3.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F00090 /* PRNumber3.ttf */; };
-		A1000001233F0000J /* 01_school.gz in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F000J0 /* 01_school.gz */; };
+		A1000001233F0000J /* 01_common.gz in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F000J0 /* 01_common.gz */; };
 		A1000001233F0000K /* 02_full.gz in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F000K0 /* 02_full.gz */; };
-		A1000001233F0000L /* 03_common.gz in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F000L0 /* 03_common.gz */; };
 		A1000001233F0000D /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F000D1 /* icon.png */; };
 		A1000001233F000G1 /* frame.png in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F000G0 /* frame.png */; };
 		A1000001233F000M1 /* NASPA_logo_small.png in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F000M0 /* NASPA_logo_small.png */; };
@@ -44,9 +43,8 @@
 		A1000001233F00080 /* PrintChar21.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = PrintChar21.ttf; sourceTree = "<group>"; };
 		A1000001233F00090 /* PRNumber3.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = PRNumber3.ttf; sourceTree = "<group>"; };
 		A1000001233F000C0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A1000001233F000J0 /* 01_school.gz */ = {isa = PBXFileReference; lastKnownFileType = archive.gzip; path = 01_school.gz; sourceTree = "<group>"; };
+		A1000001233F000J0 /* 01_common.gz */ = {isa = PBXFileReference; lastKnownFileType = archive.gzip; path = 01_common.gz; sourceTree = "<group>"; };
 		A1000001233F000K0 /* 02_full.gz */ = {isa = PBXFileReference; lastKnownFileType = archive.gzip; path = 02_full.gz; sourceTree = "<group>"; };
-		A1000001233F000L0 /* 03_common.gz */ = {isa = PBXFileReference; lastKnownFileType = archive.gzip; path = 03_common.gz; sourceTree = "<group>"; };
 		A1000001233F000D0 /* PlaintextPanic.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PlaintextPanic.entitlements; sourceTree = "<group>"; };
 		A1000001233F000D1 /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Resources/icon.png; sourceTree = "<group>"; };
 		A1000001233F000G0 /* frame.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Resources/frame.png; sourceTree = "<group>"; };
@@ -145,9 +143,8 @@
 		A1000001233F00316 /* WordLists */ = {
 			isa = PBXGroup;
 			children = (
-				A1000001233F000J0 /* 01_school.gz */,
+				A1000001233F000J0 /* 01_common.gz */,
 				A1000001233F000K0 /* 02_full.gz */,
-				A1000001233F000L0 /* 03_common.gz */,
 			);
 			name = WordLists;
 			path = Resources/WordLists;
@@ -221,9 +218,8 @@
 			files = (
 				A1000001233F00008 /* PrintChar21.ttf in Resources */,
 				A1000001233F00009 /* PRNumber3.ttf in Resources */,
-				A1000001233F0000J /* 01_school.gz in Resources */,
+				A1000001233F0000J /* 01_common.gz in Resources */,
 				A1000001233F0000K /* 02_full.gz in Resources */,
-				A1000001233F0000L /* 03_common.gz in Resources */,
 				A1000001233F0000D /* icon.png in Resources */,
 				A1000001233F000G1 /* frame.png in Resources */,
 				A1000001233F000M1 /* NASPA_logo_small.png in Resources */,
@@ -381,7 +377,7 @@
 				CODE_SIGN_ENTITLEMENTS = PlaintextPanic/PlaintextPanic.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 2T9LB27UWT;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -394,7 +390,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.plaintextpanic.palefire;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -410,7 +406,7 @@
 				CODE_SIGN_ENTITLEMENTS = PlaintextPanic/PlaintextPanic.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = 2T9LB27UWT;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -423,7 +419,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = com.plaintextpanic.palefire;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;

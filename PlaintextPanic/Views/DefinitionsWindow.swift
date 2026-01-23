@@ -182,6 +182,30 @@ struct WordContentRow: View {
     let inkColor = Color(red: 0.17, green: 0.17, blue: 0.17)
     let greenBarColor = Color(red: 0.88, green: 0.95, blue: 0.89)
 
+    // Parse stem reference if definition starts with "< STEM,"
+    private var stemReference: String? {
+        guard definition.hasPrefix("< ") else { return nil }
+        // Find the comma that ends the stem reference
+        if let commaIndex = definition.firstIndex(of: ",") {
+            return String(definition[..<commaIndex])
+        }
+        return nil
+    }
+
+    private var mainDefinition: String {
+        guard let stem = stemReference,
+              let commaIndex = definition.firstIndex(of: ",") else {
+            return definition
+        }
+        // Get everything after "< STEM, " - skip the comma and space
+        let afterComma = definition.index(after: commaIndex)
+        if afterComma < definition.endIndex {
+            let remaining = definition[afterComma...].trimmingCharacters(in: .whitespaces)
+            return remaining
+        }
+        return definition
+    }
+
     var body: some View {
         HStack(alignment: .top, spacing: 8) {
             Text(word)
@@ -195,10 +219,18 @@ struct WordContentRow: View {
                 .frame(width: 22)
                 .padding(.top, 2)
 
-            Text(definition)
-                .font(.custom("Courier", size: 15))
-                .foregroundColor(inkColor.opacity(0.85))
-                .fixedSize(horizontal: false, vertical: true)
+            // Definition with optional stem reference on separate line
+            VStack(alignment: .leading, spacing: 2) {
+                if let stem = stemReference {
+                    Text(stem)
+                        .font(.custom("Courier", size: 15).bold())
+                        .foregroundColor(inkColor.opacity(0.6))
+                }
+                Text(mainDefinition)
+                    .font(.custom("Courier", size: 15))
+                    .foregroundColor(inkColor.opacity(0.85))
+                    .fixedSize(horizontal: false, vertical: true)
+            }
 
             Spacer()
         }

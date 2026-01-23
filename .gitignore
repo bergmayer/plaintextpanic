@@ -32,6 +32,9 @@ PlaintextPanic.dmg
 *.cer
 *.dmg
 
+# Python virtual environment (for icon generation script)
+.venv/
+
 # Original uncompressed word lists (not for distribution - compressed versions are in app)
 /wordlists/
 

@@ -3,23 +3,20 @@ import AppKit
 import Compression
 
 enum WordListType: String, CaseIterable {
-    case school = "school"
     case full = "full"
     case common = "common"
 
     var displayName: String {
         switch self {
-        case .school: return "NASPA School Word List 2023"
-        case .full: return "NASPA Word List 2023"
-        case .common: return "Common 7-Letter Words Only"
+        case .common: return "Common 7-Letter Words"
+        case .full: return "Full NASPA Word List"
         }
     }
 
     var filename: String {
         switch self {
-        case .school: return "01_school"
+        case .common: return "01_common"
         case .full: return "02_full"
-        case .common: return "03_common"
         }
     }
 }
@@ -29,13 +26,13 @@ class Lexicon {
     private var definitions: [String: String] = [:]  // word -> definition
     private var sevenLetterWords: [String] = []
     private var anagramGroups: [String: [String]] = [:]  // sorted letters -> list of words
-    private(set) var currentWordList: WordListType = .school
+    private(set) var currentWordList: WordListType = .full
 
     var wordCount: Int { words.count }
 
     init() {}
 
-    func load(wordList: WordListType = .school) -> Bool {
+    func load(wordList: WordListType = .full) -> Bool {
         currentWordList = wordList
         let filename = wordList.filename
 

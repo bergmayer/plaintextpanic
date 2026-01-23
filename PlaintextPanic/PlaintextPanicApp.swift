@@ -30,23 +30,12 @@ struct PlaintextPanicApp: App {
                 Divider()
                 Menu("Word List") {
                     Button {
-                        gameEngine.switchWordList(to: .school)
-                    } label: {
-                        if gameEngine.currentWordList == .school {
-                            Text("✓ NASPA School Word List 2023")
-                        } else {
-                            Text("   NASPA School Word List 2023")
-                        }
-                    }
-                    .disabled(gameEngine.gameMode != .titleScreen)
-
-                    Button {
                         gameEngine.switchWordList(to: .full)
                     } label: {
                         if gameEngine.currentWordList == .full {
-                            Text("✓ NASPA Word List 2023")
+                            Text("✓ Full NASPA Word List")
                         } else {
-                            Text("   NASPA Word List 2023")
+                            Text("   Full NASPA Word List")
                         }
                     }
                     .disabled(gameEngine.gameMode != .titleScreen)
@@ -55,9 +44,9 @@ struct PlaintextPanicApp: App {
                         gameEngine.switchWordList(to: .common)
                     } label: {
                         if gameEngine.currentWordList == .common {
-                            Text("✓ Common 7-Letter Words Only")
+                            Text("✓ Common 7-Letter Words")
                         } else {
-                            Text("   Common 7-Letter Words Only")
+                            Text("   Common 7-Letter Words")
                         }
                     }
                     .disabled(gameEngine.gameMode != .titleScreen)

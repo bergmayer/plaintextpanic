@@ -33,7 +33,7 @@ class GameEngine: ObservableObject {
     #else
     let isDebugMode: Bool = false  // Always false in release builds
     #endif
-    @Published var currentWordList: WordListType = .school  // Current word list selection
+    @Published var currentWordList: WordListType = .full  // Current word list selection
     @Published var letterColor: LetterColor = .green  // Letter color preference
 
     // Flash screen state (BINGO/WOW rendered to buffer)
@@ -542,7 +542,7 @@ class GameEngine: ObservableObject {
         if roundScore >= minScoreRequired {
             writeCentered("[ENTER] NEXT ROUND   [D] DEFINITIONS", row: 22)
         } else {
-            writeCentered("NOT ENOUGH POINTS TO CONTINUE", row: 22)
+            writeCentered("NOT ENOUGH POINTS   [D] DEFINITIONS", row: 22)
         }
         writeCentered("[ESC] END   [H] HIGH SCORES", row: 23)
     }
