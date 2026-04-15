@@ -11,56 +11,56 @@
 		A1000001233F00002 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001233F00020 /* ContentView.swift */; };
 		A1000001233F00003 /* TerminalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001233F00030 /* TerminalView.swift */; };
 		A1000001233F00004 /* DefinitionsWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001233F00040 /* DefinitionsWindow.swift */; };
-		A1000001233F0000E /* AboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001233F000E0 /* AboutWindow.swift */; };
-		A1000001233F000H1 /* HelpWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001233F000H0 /* HelpWindow.swift */; };
-		A1000001233F000I1 /* HighScoresWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001233F000I0 /* HighScoresWindow.swift */; };
 		A1000001233F00005 /* Lexicon.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001233F00050 /* Lexicon.swift */; };
 		A1000001233F00006 /* GameEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001233F00060 /* GameEngine.swift */; };
+		A1000001233F00008 /* PrintChar21.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F00080 /* PrintChar21.ttf */; };
+		A1000001233F00009 /* PRNumber3.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F00090 /* PRNumber3.ttf */; };
+		A1000001233F0000D /* Resources/icon.png in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F000D1 /* Resources/icon.png */; };
+		A1000001233F0000E /* AboutWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001233F000E0 /* AboutWindow.swift */; };
+		A1000001233F0000J /* 01_common.gz in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F000J0 /* 01_common.gz */; };
+		A1000001233F0000K /* 02_full.gz in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F000K0 /* 02_full.gz */; };
+		A1000001233F000F1 /* CRTDistortion.metal in Sources */ = {isa = PBXBuildFile; fileRef = A1000001233F000F0 /* CRTDistortion.metal */; };
+		A1000001233F000G1 /* Resources/frame.png in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F000G0 /* Resources/frame.png */; };
+		A1000001233F000H1 /* HelpWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001233F000H0 /* HelpWindow.swift */; };
+		A1000001233F000I1 /* HighScoresWindow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001233F000I0 /* HighScoresWindow.swift */; };
+		A1000001233F000M1 /* Resources/NASPA_logo_small.png in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F000M0 /* Resources/NASPA_logo_small.png */; };
+		A1000001233F000N1 /* Resources/FontLicense.txt in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F000N0 /* Resources/FontLicense.txt */; };
+		A1000001233F000O1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F000O0 /* Assets.xcassets */; };
 		A1000001233F000P1 /* SoundEffects.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001233F000P0 /* SoundEffects.swift */; };
 		A1000001233F000Q1 /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001233F000Q0 /* SettingsView.swift */; };
 		A1000001233F000R1 /* PaperUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001233F000R0 /* PaperUI.swift */; };
 		A1000001233F000S1 /* GameEngine+Rendering.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001233F000S0 /* GameEngine+Rendering.swift */; };
 		A1000001233F000T1 /* GameEngine+Input.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1000001233F000T0 /* GameEngine+Input.swift */; };
-		A1000001233F000F1 /* CRTDistortion.metal in Sources */ = {isa = PBXBuildFile; fileRef = A1000001233F000F0 /* CRTDistortion.metal */; };
-		A1000001233F00008 /* PrintChar21.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F00080 /* PrintChar21.ttf */; };
-		A1000001233F00009 /* PRNumber3.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F00090 /* PRNumber3.ttf */; };
-		A1000001233F0000J /* 01_common.gz in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F000J0 /* 01_common.gz */; };
-		A1000001233F0000K /* 02_full.gz in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F000K0 /* 02_full.gz */; };
-		A1000001233F0000D /* icon.png in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F000D1 /* icon.png */; };
-		A1000001233F000G1 /* frame.png in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F000G0 /* frame.png */; };
-		A1000001233F000M1 /* NASPA_logo_small.png in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F000M0 /* NASPA_logo_small.png */; };
-		A1000001233F000N1 /* FontLicense.txt in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F000N0 /* FontLicense.txt */; };
-		A1000001233F000O1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A1000001233F000O0 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		A1000001233F00100 /* PlaintextPanic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PlaintextPanic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1000001233F00010 /* PlaintextPanicApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaintextPanicApp.swift; sourceTree = "<group>"; };
 		A1000001233F00020 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		A1000001233F00030 /* TerminalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TerminalView.swift; sourceTree = "<group>"; };
 		A1000001233F00040 /* DefinitionsWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefinitionsWindow.swift; sourceTree = "<group>"; };
-		A1000001233F000E0 /* AboutWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutWindow.swift; sourceTree = "<group>"; };
-		A1000001233F000H0 /* HelpWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpWindow.swift; sourceTree = "<group>"; };
-		A1000001233F000I0 /* HighScoresWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighScoresWindow.swift; sourceTree = "<group>"; };
 		A1000001233F00050 /* Lexicon.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Lexicon.swift; sourceTree = "<group>"; };
 		A1000001233F00060 /* GameEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameEngine.swift; sourceTree = "<group>"; };
+		A1000001233F00080 /* PrintChar21.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = PrintChar21.ttf; sourceTree = "<group>"; };
+		A1000001233F00090 /* PRNumber3.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = PRNumber3.ttf; sourceTree = "<group>"; };
+		A1000001233F000C0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A1000001233F000D0 /* PlaintextPanic.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PlaintextPanic.entitlements; sourceTree = "<group>"; };
+		A1000001233F000D1 /* Resources/icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Resources/icon.png; sourceTree = "<group>"; };
+		A1000001233F000E0 /* AboutWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AboutWindow.swift; sourceTree = "<group>"; };
+		A1000001233F000F0 /* CRTDistortion.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = CRTDistortion.metal; sourceTree = "<group>"; };
+		A1000001233F000G0 /* Resources/frame.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Resources/frame.png; sourceTree = "<group>"; };
+		A1000001233F000H0 /* HelpWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HelpWindow.swift; sourceTree = "<group>"; };
+		A1000001233F000I0 /* HighScoresWindow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HighScoresWindow.swift; sourceTree = "<group>"; };
+		A1000001233F000J0 /* 01_common.gz */ = {isa = PBXFileReference; lastKnownFileType = archive.gzip; path = 01_common.gz; sourceTree = "<group>"; };
+		A1000001233F000K0 /* 02_full.gz */ = {isa = PBXFileReference; lastKnownFileType = archive.gzip; path = 02_full.gz; sourceTree = "<group>"; };
+		A1000001233F000M0 /* Resources/NASPA_logo_small.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Resources/NASPA_logo_small.png; sourceTree = "<group>"; };
+		A1000001233F000N0 /* Resources/FontLicense.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Resources/FontLicense.txt; sourceTree = "<group>"; };
+		A1000001233F000O0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A1000001233F000P0 /* SoundEffects.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundEffects.swift; sourceTree = "<group>"; };
 		A1000001233F000Q0 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		A1000001233F000R0 /* PaperUI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaperUI.swift; sourceTree = "<group>"; };
 		A1000001233F000S0 /* GameEngine+Rendering.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameEngine+Rendering.swift"; sourceTree = "<group>"; };
 		A1000001233F000T0 /* GameEngine+Input.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "GameEngine+Input.swift"; sourceTree = "<group>"; };
-		A1000001233F000F0 /* CRTDistortion.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = CRTDistortion.metal; sourceTree = "<group>"; };
-		A1000001233F00080 /* PrintChar21.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = PrintChar21.ttf; sourceTree = "<group>"; };
-		A1000001233F00090 /* PRNumber3.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = PRNumber3.ttf; sourceTree = "<group>"; };
-		A1000001233F000C0 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		A1000001233F000J0 /* 01_common.gz */ = {isa = PBXFileReference; lastKnownFileType = archive.gzip; path = 01_common.gz; sourceTree = "<group>"; };
-		A1000001233F000K0 /* 02_full.gz */ = {isa = PBXFileReference; lastKnownFileType = archive.gzip; path = 02_full.gz; sourceTree = "<group>"; };
-		A1000001233F000D0 /* PlaintextPanic.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = PlaintextPanic.entitlements; sourceTree = "<group>"; };
-		A1000001233F000D1 /* icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Resources/icon.png; sourceTree = "<group>"; };
-		A1000001233F000G0 /* frame.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Resources/frame.png; sourceTree = "<group>"; };
-		A1000001233F000M0 /* NASPA_logo_small.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Resources/NASPA_logo_small.png; sourceTree = "<group>"; };
-		A1000001233F000N0 /* FontLicense.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = Resources/FontLicense.txt; sourceTree = "<group>"; };
-		A1000001233F000O0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A1000001233F00100 /* PlaintextPanic.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PlaintextPanic.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -93,10 +93,10 @@
 				A1000001233F000O0 /* Assets.xcassets */,
 				A1000001233F000C0 /* Info.plist */,
 				A1000001233F000D0 /* PlaintextPanic.entitlements */,
-				A1000001233F000D1 /* icon.png */,
-				A1000001233F000G0 /* frame.png */,
-				A1000001233F000M0 /* NASPA_logo_small.png */,
-				A1000001233F000N0 /* FontLicense.txt */,
+				A1000001233F000D1 /* Resources/icon.png */,
+				A1000001233F000G0 /* Resources/frame.png */,
+				A1000001233F000M0 /* Resources/NASPA_logo_small.png */,
+				A1000001233F000N0 /* Resources/FontLicense.txt */,
 			);
 			path = PlaintextPanic;
 			sourceTree = "<group>";
@@ -235,10 +235,10 @@
 				A1000001233F00009 /* PRNumber3.ttf in Resources */,
 				A1000001233F0000J /* 01_common.gz in Resources */,
 				A1000001233F0000K /* 02_full.gz in Resources */,
-				A1000001233F0000D /* icon.png in Resources */,
-				A1000001233F000G1 /* frame.png in Resources */,
-				A1000001233F000M1 /* NASPA_logo_small.png in Resources */,
-				A1000001233F000N1 /* FontLicense.txt in Resources */,
+				A1000001233F0000D /* Resources/icon.png in Resources */,
+				A1000001233F000G1 /* Resources/frame.png in Resources */,
+				A1000001233F000M1 /* Resources/NASPA_logo_small.png in Resources */,
+				A1000001233F000N1 /* Resources/FontLicense.txt in Resources */,
 				A1000001233F000O1 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -397,7 +397,7 @@
 				CODE_SIGN_ENTITLEMENTS = PlaintextPanic/PlaintextPanic.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = 2T9LB27UWT;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -410,7 +410,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.plaintextpanic.palefire;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -426,7 +426,7 @@
 				CODE_SIGN_ENTITLEMENTS = PlaintextPanic/PlaintextPanic.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = 2T9LB27UWT;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -439,7 +439,7 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.plaintextpanic.palefire;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
