@@ -1,3 +1,5 @@
+.claude/
+
 # Xcode
 build/
 *.pbxuser
