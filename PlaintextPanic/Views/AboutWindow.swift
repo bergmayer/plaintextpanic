@@ -133,7 +133,7 @@ struct AboutLogoRow: View {
 // MARK: - About Window View
 
 struct AboutWindow: View {
-    @Environment(\.dismiss) private var dismiss
+    let onClose: () -> Void
 
     private let naspaURL = URL(string: "https://www.scrabbleplayers.org")!
     private let kreativeURL = URL(string: "https://www.kreativekorp.com/software/fonts/apple2/")!
@@ -235,7 +235,7 @@ struct AboutWindow: View {
         .background(Color(red: 0.2, green: 0.2, blue: 0.2))
         .shadow(color: Color.black.opacity(0.3), radius: 8, x: 0, y: 4)
         .background(
-            Button("") { dismiss() }
+            Button("") { onClose() }
                 .keyboardShortcut(.escape, modifiers: [])
                 .opacity(0)
         )
@@ -258,7 +258,7 @@ class AboutWindowController: NSObject, NSWindowDelegate {
             performSafeClose()
         }
 
-        let contentView = AboutWindow()
+        let contentView = AboutWindow(onClose: { [weak self] in self?.close() })
         let hosting = NSHostingController(rootView: contentView)
         hostingController = hosting
 

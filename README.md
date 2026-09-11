@@ -5,9 +5,9 @@ A retro word puzzle game for macOS with Apple II-style aesthetics.  Find as many
 ## Features
 
 - Apple II CRT monitor aesthetic with barrel distortion and scanlines
-- Progressive difficulty: point target starts at 400 and increases by 25 each round (max 525)
-- One bingo hint per round (TAB key) reveals 3 letters of an unfound 7-letter word
-- Apple II-style square wave sound effects (toggle from View menu)
+- Progressive difficulty: point target starts at 400 and increases by 25 each round (max 525); finding every word also advances the round
+- One bingo hint per round (TAB key) reveals 3 letters of an unfound 7-letter word; all remaining bingos earn half points
+- Apple II-style square wave sound effects (toggle in Settings)
 - Pause mid-round with ESC (hides the board; ESC again to end round)
 - Dynamic column headers showing found/total word counts per length
 - Multiple word lists to choose from
@@ -25,6 +25,10 @@ Requires Xcode with macOS SDK.
 ./build.sh run      # Build debug and launch
 ```
 
+## Tests
+
+Run `./Tests/run.sh` to compile and exercise the actual app sources in both Debug and Release modes. The regression suite checks game transitions, dictionary failures, window-scoped keyboard input, scoring, persistence, and the fixed 24-row by 40-column layout. It uses isolated preferences and temporary fixtures. Set `DEVELOPER_DIR` if Xcode is installed elsewhere.
+
 ## Controls
 
 | Key | Action |
@@ -39,7 +43,7 @@ Requires Xcode with macOS SDK.
 | ESC | Pause (ESC again to end round) |
 | D | View definitions (after round) |
 | H | View high scores |
-| ? | How to Play |
+| CMD-? | How to Play |
 
 ## Word Lists
 

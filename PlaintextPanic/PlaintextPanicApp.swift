@@ -12,7 +12,9 @@ private enum KeyCode {
     static let rightArrow: UInt16 = 124
 }
 
+#if !TESTING
 @main
+#endif
 struct PlaintextPanicApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var gameEngine = GameEngine()
@@ -78,6 +80,7 @@ struct WindowConfigurator: NSViewRepresentable {
         let view = NSView()
         DispatchQueue.main.async {
             if let window = view.window {
+                window.identifier = NSUserInterfaceItemIdentifier("game")
                 window.isOpaque = false
                 window.backgroundColor = .clear
                 window.titlebarAppearsTransparent = true
@@ -170,6 +173,7 @@ struct WindowConfigurator: NSViewRepresentable {
     func updateNSView(_ nsView: NSView, context: Context) {}
 }
 
+@MainActor
 class AppDelegate: NSObject, NSApplicationDelegate {
     var gameEngine: GameEngine?
     private var eventMonitor: Any?
@@ -189,7 +193,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     func showHighScores() {
         guard let engine = gameEngine else { return }
-        highScoresController.show(highScores: engine.highScores)
+        highScoresController.show(engine: engine)
     }
 
     func setupKeyboardMonitor() {
@@ -198,84 +202,99 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         eventMonitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown]) { [weak self] event in
-            guard let self = self, let engine = self.gameEngine else { return event }
-
-            let modifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
-
-            // ESC - Context dependent
-            if event.keyCode == KeyCode.escape {
-                // First try to close definitions window if open
-                if engine.closeDefinitionsWindow() {
-                    return nil
-                }
-                engine.handleEscape()
-                return nil
+            let consumed = MainActor.assumeIsolated {
+                guard let self else { return false }
+                return self.handleKeyEvent(event) == nil
             }
-
-            // Arrow keys - scroll word lists (up/down) and bingos (left/right)
-            if event.keyCode == KeyCode.upArrow {
-                engine.handleArrowKey(isUp: true)
-                return nil
-            }
-            if event.keyCode == KeyCode.downArrow {
-                engine.handleArrowKey(isUp: false)
-                return nil
-            }
-            if event.keyCode == KeyCode.leftArrow {
-                engine.handleHorizontalArrowKey(isLeft: true)
-                return nil
-            }
-            if event.keyCode == KeyCode.rightArrow {
-                engine.handleHorizontalArrowKey(isLeft: false)
-                return nil
-            }
-
-            #if DEBUG
-            // Debug shortcuts (Ctrl+Cmd+Opt)
-            if modifiers.contains(.command) && modifiers.contains(.control) && modifiers.contains(.option) {
-                if event.charactersIgnoringModifiers?.uppercased() == "D" {
-                    engine.toggleDebugMode()
-                    return nil
-                }
-                if event.charactersIgnoringModifiers?.uppercased() == "W" {
-                    engine.debugSimulatePerfectRound()
-                    return nil
-                }
-                if event.charactersIgnoringModifiers?.uppercased() == "B" {
-                    engine.debugSimulateBingo()
-                    return nil
-                }
-                if event.charactersIgnoringModifiers == "7" {
-                    engine.debugStartMultiBingoRound()
-                    return nil
-                }
-                if event.charactersIgnoringModifiers?.uppercased() == "X" {
-                    engine.debugStartStressTest()
-                    return nil
-                }
-                if event.charactersIgnoringModifiers?.uppercased() == "T" {
-                    engine.debugSetShortTimer()
-                    return nil
-                }
-            }
-            #endif
-
-            // TAB - Bingo hint
-            if event.keyCode == KeyCode.tab {
-                engine.handleHint()
-                return nil
-            }
-
-            // Regular keys (no command modifier)
-            if !modifiers.contains(.command) {
-                if let chars = event.characters {
-                    engine.handleKeyPress(chars)
-                }
-                return nil
-            }
-
-            return event
+            return consumed ? nil : event
         }
+    }
+
+    func handleKeyEvent(_ event: NSEvent) -> NSEvent? {
+        guard let engine = gameEngine else { return event }
+
+        // Secondary windows and modal alerts retain native keyboard behavior.
+        guard NSApp.modalWindow == nil,
+              let window = event.window,
+              window.identifier == NSUserInterfaceItemIdentifier("game") else { return event }
+
+        let modifiers = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+
+        // ESC - Context dependent
+        if event.keyCode == KeyCode.escape {
+            engine.handleEscape()
+            return nil
+        }
+
+        // The pause prompt promises any key resumes, including Tab and arrows.
+        if engine.gameMode == .playing, engine.isPaused, !modifiers.contains(.command) {
+            engine.handleKeyPress(event.characters ?? "")
+            return nil
+        }
+
+        // Arrow keys - scroll word lists (up/down) and bingos (left/right)
+        if event.keyCode == KeyCode.upArrow {
+            engine.handleArrowKey(isUp: true)
+            return nil
+        }
+        if event.keyCode == KeyCode.downArrow {
+            engine.handleArrowKey(isUp: false)
+            return nil
+        }
+        if event.keyCode == KeyCode.leftArrow {
+            engine.handleHorizontalArrowKey(isLeft: true)
+            return nil
+        }
+        if event.keyCode == KeyCode.rightArrow {
+            engine.handleHorizontalArrowKey(isLeft: false)
+            return nil
+        }
+
+        #if DEBUG
+        // Debug shortcuts (Ctrl+Cmd+Opt)
+        if modifiers.contains(.command) && modifiers.contains(.control) && modifiers.contains(.option) {
+            if event.charactersIgnoringModifiers?.uppercased() == "D" {
+                engine.toggleDebugMode()
+                return nil
+            }
+            if event.charactersIgnoringModifiers?.uppercased() == "W" {
+                engine.debugSimulatePerfectRound()
+                return nil
+            }
+            if event.charactersIgnoringModifiers?.uppercased() == "B" {
+                engine.debugSimulateBingo()
+                return nil
+            }
+            if event.charactersIgnoringModifiers == "7" {
+                engine.debugStartMultiBingoRound()
+                return nil
+            }
+            if event.charactersIgnoringModifiers?.uppercased() == "X" {
+                engine.debugStartStressTest()
+                return nil
+            }
+            if event.charactersIgnoringModifiers?.uppercased() == "T" {
+                engine.debugSetShortTimer()
+                return nil
+            }
+        }
+        #endif
+
+        // TAB - Bingo hint
+        if event.keyCode == KeyCode.tab {
+            engine.handleHint()
+            return nil
+        }
+
+        // Regular keys (no command modifier)
+        if !modifiers.contains(.command) {
+            if let chars = event.characters {
+                engine.handleKeyPress(chars)
+            }
+            return nil
+        }
+
+        return event
     }
 
     func confirmResetHighScores() {

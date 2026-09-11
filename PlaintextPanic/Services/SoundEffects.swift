@@ -1,201 +1,83 @@
 import AVFoundation
 import Foundation
 
+/// Prepare complete sounds on the main actor; AVAudioPlayerNode owns rendering.
+/// No application state, locks, or allocations run in an audio render callback.
+@MainActor
 class SoundEffects {
     private var audioEngine: AVAudioEngine?
-    private var sourceNode: AVAudioSourceNode?
-    private var isEnabled: Bool
-    private var sampleRate: Double = 44100.0
-
-    // Audio thread state
-    private var currentPhase: Double = 0.0
-    private var samplesRemaining: Int = 0
-    private var currentFrequency: Double = 0.0
-
-    // Multi-tone sequence support (for fanfare)
-    private var toneQueue: [(frequency: Double, durationSamples: Int)] = []
-    private let toneQueueLock = NSLock()
-
+    private var player: AVAudioPlayerNode?
+    private let format = AVAudioFormat(standardFormatWithSampleRate: 44100, channels: 1)!
+    private let defaults: UserDefaults
     private let soundEnabledKey = "PlaintextPanicSoundEnabled"
 
-    init() {
-        isEnabled = UserDefaults.standard.object(forKey: soundEnabledKey) == nil
-            ? true
-            : UserDefaults.standard.bool(forKey: soundEnabledKey)
-        setupAudioEngine()
-    }
-
     var soundEnabled: Bool {
-        get { isEnabled }
-        set {
-            isEnabled = newValue
-            UserDefaults.standard.set(newValue, forKey: soundEnabledKey)
-        }
-    }
-
-    private func setupAudioEngine() {
-        let engine = AVAudioEngine()
-        let outputFormat = engine.outputNode.inputFormat(forBus: 0)
-        sampleRate = outputFormat.sampleRate > 0 ? outputFormat.sampleRate : 44100.0
-
-        let node = AVAudioSourceNode(format: outputFormat) { [weak self] _, _, frameCount, audioBufferList -> OSStatus in
-            guard let self = self else { return noErr }
-
-            let ablPointer = UnsafeMutableAudioBufferListPointer(audioBufferList)
-
-            for frame in 0..<Int(frameCount) {
-                var sample: Float = 0.0
-
-                if self.samplesRemaining > 0 && self.currentFrequency > 0 {
-                    // Generate square wave - the authentic Apple II sound
-                    let phaseIncrement = self.currentFrequency / self.sampleRate
-                    self.currentPhase += phaseIncrement
-                    if self.currentPhase >= 1.0 { self.currentPhase -= 1.0 }
-
-                    sample = self.currentPhase < 0.5 ? 0.15 : -0.15
-                    self.samplesRemaining -= 1
-
-                    // Advance to next tone in queue when current finishes
-                    if self.samplesRemaining == 0 {
-                        self.toneQueueLock.lock()
-                        if !self.toneQueue.isEmpty {
-                            let next = self.toneQueue.removeFirst()
-                            self.currentFrequency = next.frequency
-                            self.samplesRemaining = next.durationSamples
-                            self.currentPhase = 0.0
-                        }
-                        self.toneQueueLock.unlock()
-                    }
-                }
-
-                for buffer in ablPointer {
-                    let buf = UnsafeMutableBufferPointer<Float>(buffer)
-                    buf[frame] = sample
-                }
+        didSet {
+            defaults.set(soundEnabled, forKey: soundEnabledKey)
+            if !soundEnabled {
+                player?.stop()
+                audioEngine?.pause()
             }
-
-            return noErr
         }
-
-        engine.attach(node)
-        engine.connect(node, to: engine.mainMixerNode, format: outputFormat)
-
-        self.audioEngine = engine
-        self.sourceNode = node
     }
 
-    private func ensureEngineRunning() {
-        guard let engine = audioEngine, !engine.isRunning else { return }
+    init(defaults: UserDefaults = .standard) {
+        self.defaults = defaults
+        soundEnabled = defaults.object(forKey: soundEnabledKey) == nil
+            ? true : defaults.bool(forKey: soundEnabledKey)
+    }
+
+    // Each new effect replaces the previous one, as in the original game.
+    private func play(_ tones: [(frequency: Double, milliseconds: Double)]) {
+        guard soundEnabled else { return }
+        if audioEngine == nil {
+            let engine = AVAudioEngine()
+            let node = AVAudioPlayerNode()
+            engine.attach(node)
+            engine.connect(node, to: engine.mainMixerNode, format: format)
+            audioEngine = engine
+            player = node
+        }
+        guard let engine = audioEngine, let player else { return }
+        let counts = tones.map { Int(format.sampleRate * $0.milliseconds / 1000) }
+        let frameCount = counts.reduce(0, +)
+        guard let buffer = AVAudioPCMBuffer(pcmFormat: format, frameCapacity: AVAudioFrameCount(frameCount)),
+              let samples = buffer.floatChannelData?[0] else { return }
+        buffer.frameLength = AVAudioFrameCount(frameCount)
+        var offset = 0
+        for (tone, count) in zip(tones, counts) {
+            var phase = 0.0
+            for _ in 0..<count {
+                phase += tone.frequency / format.sampleRate
+                if phase >= 1 { phase -= 1 }
+                samples[offset] = phase < 0.5 ? 0.15 : -0.15
+                offset += 1
+            }
+        }
         do {
-            try engine.start()
+            if !engine.isRunning { try engine.start() }
+            player.stop()
+            player.scheduleBuffer(buffer)
+            player.play()
         } catch {
-            // Silently fail - game works fine without sound
+            // Sound is optional; allow a later keypress to retry the engine.
         }
     }
 
-    private func playTone(frequency: Double, durationMs: Double) {
-        guard isEnabled else { return }
-        ensureEngineRunning()
+    func playValidWord() { play([(800, 150)]) }
+    func playInvalidBuzz() { play([(200, 100)]) }
+    func playKeystroke() { play([(1200, 30)]) }
 
-        let durationSamples = Int(sampleRate * durationMs / 1000.0)
-
-        // Clear any queued tones
-        toneQueueLock.lock()
-        toneQueue.removeAll()
-        toneQueueLock.unlock()
-
-        // Set new tone - order matters for thread safety:
-        // zero out remaining first, then set frequency/phase, then set remaining
-        samplesRemaining = 0
-        currentFrequency = frequency
-        currentPhase = 0.0
-        samplesRemaining = durationSamples
-    }
-
-    // MARK: - Sound Effects
-
-    /// Short beep for valid word found
-    func playValidWord() {
-        playTone(frequency: 800, durationMs: 150)
-    }
-
-    /// Low buzz for invalid word / error
-    func playInvalidBuzz() {
-        playTone(frequency: 200, durationMs: 100)
-    }
-
-    /// Subtle tick for keystroke
-    func playKeystroke() {
-        playTone(frequency: 1200, durationMs: 30)
-    }
-
-    /// Countdown beep - 4 flat beeps then a buzzer
     func playCountdown(secondsLeft: Int) {
         switch secondsLeft {
-        case 5, 4, 3, 2:
-            playTone(frequency: 600, durationMs: 80)
-        case 1:
-            playBuzzer()
-        default: return
+        case 2...5: play([(600, 80)])
+        case 1: play([(150, 35), (250, 35), (150, 35), (250, 35),
+                      (150, 35), (250, 35), (150, 35), (250, 35)])
+        default: break
         }
     }
 
-    /// Harsh buzzer - rapidly alternates between two low frequencies
-    private func playBuzzer() {
-        guard isEnabled else { return }
-        ensureEngineRunning()
-
-        // Alternate between 150Hz and 250Hz in short bursts for a jagged buzzer
-        let tones: [(Double, Double)] = [
-            (150, 35), (250, 35),
-            (150, 35), (250, 35),
-            (150, 35), (250, 35),
-            (150, 35), (250, 35),
-        ]
-
-        toneQueueLock.lock()
-        toneQueue.removeAll()
-        for i in 1..<tones.count {
-            toneQueue.append((
-                frequency: tones[i].0,
-                durationSamples: Int(sampleRate * tones[i].1 / 1000.0)
-            ))
-        }
-        toneQueueLock.unlock()
-
-        samplesRemaining = 0
-        currentFrequency = tones[0].0
-        currentPhase = 0.0
-        samplesRemaining = Int(sampleRate * tones[0].1 / 1000.0)
-    }
-
-    /// Ascending fanfare for BINGO (C4-E4-G4-C5)
     func playBingoFanfare() {
-        guard isEnabled else { return }
-        ensureEngineRunning()
-
-        let tones: [(Double, Double)] = [
-            (261.63, 150),  // C4
-            (329.63, 150),  // E4
-            (392.00, 150),  // G4
-            (523.25, 300),  // C5 (longer final note)
-        ]
-
-        // Queue all tones after the first
-        toneQueueLock.lock()
-        toneQueue.removeAll()
-        for i in 1..<tones.count {
-            toneQueue.append((
-                frequency: tones[i].0,
-                durationSamples: Int(sampleRate * tones[i].1 / 1000.0)
-            ))
-        }
-        toneQueueLock.unlock()
-
-        // Start the first tone
-        samplesRemaining = 0
-        currentFrequency = tones[0].0
-        currentPhase = 0.0
-        samplesRemaining = Int(sampleRate * tones[0].1 / 1000.0)
+        play([(261.63, 150), (329.63, 150), (392, 150), (523.25, 300)])
     }
 }

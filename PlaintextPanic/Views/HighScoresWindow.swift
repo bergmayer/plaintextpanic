@@ -91,8 +91,9 @@ struct NoHighScoresRow: View {
 // MARK: - High Scores Window View
 
 struct HighScoresWindow: View {
-    let highScores: [HighScoreEntry]
-    @Environment(\.dismiss) private var dismiss
+    @ObservedObject var engine: GameEngine
+    private var highScores: [HighScoreEntry] { engine.highScores }
+    let onClose: () -> Void
 
     var body: some View {
         VStack(spacing: 0) {
@@ -128,7 +129,7 @@ struct HighScoresWindow: View {
                     PaperRow(rowIndex: 7, lineHeight: 33) {
                         NoHighScoresRow(rowIndex: 7)
                     }
-                    ForEach(0..<3, id: \.self) { i in
+                    ForEach(0..<6, id: \.self) { i in
                         PaperRow(rowIndex: 8 + i, lineHeight: 33) {
                             EmptyContentRow(rowIndex: 8 + i, lineHeight: 33)
                         }
@@ -165,7 +166,7 @@ struct HighScoresWindow: View {
             .background(Color(red: 0.2, green: 0.2, blue: 0.2))
             .shadow(color: Color.black.opacity(0.3), radius: 8, x: 0, y: 4)
             .background(
-                Button("") { dismiss() }
+                Button("") { onClose() }
                     .keyboardShortcut(.escape, modifiers: [])
                     .opacity(0)
             )
@@ -183,13 +184,13 @@ class HighScoresWindowController: NSObject, NSWindowDelegate {
     private var window: NSWindow?
     private var hostingController: NSHostingController<HighScoresWindow>?
 
-    func show(highScores: [HighScoreEntry]) {
+    func show(engine: GameEngine) {
         // Close existing window safely before creating new one
         if window != nil {
             performSafeClose()
         }
 
-        let contentView = HighScoresWindow(highScores: highScores)
+        let contentView = HighScoresWindow(engine: engine, onClose: { [weak self] in self?.close() })
         let hosting = NSHostingController(rootView: contentView)
         hostingController = hosting
 

@@ -67,7 +67,7 @@ extension GameEngine {
 
         // Reveal screen - Enter to continue (if enough points), D for definitions, H for high scores
         if gameMode == .revealing {
-            if key == "\r" && roundScore >= minScoreRequired && !isStressTestMode {
+            if key == "\r" && canAdvance {
                 // Continue to next round only if scored enough (and not in stress test mode)
                 nextLevel()
             } else if key.uppercased() == "D" {

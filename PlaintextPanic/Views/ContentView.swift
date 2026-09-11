@@ -123,7 +123,7 @@ struct WindowControlButtons: View {
 
             // Minimize button
             Button(action: {
-                NSApplication.shared.windows.first?.miniaturize(nil)
+                NSApplication.shared.windows.first(where: { $0.identifier == NSUserInterfaceItemIdentifier("game") })?.miniaturize(nil)
             }) {
                 ZStack {
                     Circle()
@@ -140,7 +140,7 @@ struct WindowControlButtons: View {
 
             // Full screen button
             Button(action: {
-                NSApplication.shared.windows.first?.toggleFullScreen(nil)
+                NSApplication.shared.windows.first(where: { $0.identifier == NSUserInterfaceItemIdentifier("game") })?.toggleFullScreen(nil)
             }) {
                 ZStack {
                     Circle()

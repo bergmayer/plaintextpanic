@@ -32,6 +32,7 @@ struct HighScoreEntry: Codable {
     var round: Int
 }
 
+@MainActor
 class GameEngine: ObservableObject {
     static let bufferRows = 24
     static let bufferCols = 40
@@ -49,10 +50,31 @@ class GameEngine: ObservableObject {
     @Published var letterColor: LetterColor = .green  // Letter color preference
     @Published var isSoundEnabled: Bool = true  // Sound effects toggle
 
-    let soundEffects = SoundEffects()
+    let soundEffects: SoundEffects
+    let defaults: UserDefaults
+    var drawingBuffer = Array(repeating: Array(repeating: Character(" "), count: bufferCols), count: bufferRows)
+    var roundID = UUID()
+    var statusID = UUID()
+    var bonusID = UUID()
+    var flashID = UUID()
+    var loadError: String?
+
+    var canAdvance: Bool {
+        !isStressTestMode && (roundScore >= minScoreRequired ||
+            (!allValidWords.isEmpty && foundWords.count == allValidWords.count))
+    }
+
+    func invalidateTransientDisplays() {
+        roundID = UUID()
+        statusID = UUID()
+        bonusID = UUID()
+        flashID = UUID()
+        flashOverlay = .none
+        timeBonusDisplay = nil
+        statusMessage = ""
+    }
 
     // Flash screen state (BINGO/WOW/debug help rendered to buffer)
-    var savedBuffer: [[Character]]? = nil
     var flashOverlay: FlashOverlay = .none
 
     // Game state
@@ -71,7 +93,7 @@ class GameEngine: ObservableObject {
     var revealScrollOffset: Int = 0  // Scroll offset for reveal screen
     var gameScrollOffset: Int = 0  // Scroll offset for gameplay word matrix
     var bingoScrollOffset: Int = 0  // Horizontal scroll offset for bingos
-    var highScores: [HighScoreEntry] = []  // High score list
+    @Published var highScores: [HighScoreEntry] = []  // High score list
     #if DEBUG
     var isStressTestMode: Bool = false  // Flag for stress test display mode
     #else
@@ -87,7 +109,7 @@ class GameEngine: ObservableObject {
     var stressTestWordCounts: [Int: Int] = [:]  // Track submitted words per length in stress test
     #endif
 
-    var lexicon = Lexicon()
+    var lexicon: Lexicon
     private let highScoresKey = "PlaintextPanicHighScores"
     private let wordListKey = "PlaintextPanicWordList"
     private let letterColorKey = "PlaintextPanicLetterColor"
@@ -97,30 +119,36 @@ class GameEngine: ObservableObject {
     private var cursorTimer: Timer?
     var definitionsWindowController = DefinitionsWindowController()
 
-    init() {
+    init(defaults: UserDefaults = .standard, lexicon: Lexicon = Lexicon(), blinkCursor: Bool = true) {
+        self.defaults = defaults
+        self.lexicon = lexicon
+        self.soundEffects = SoundEffects(defaults: defaults)
         // Load word list preference
-        if let savedList = UserDefaults.standard.string(forKey: wordListKey),
+        if let savedList = defaults.string(forKey: wordListKey),
            let listType = WordListType(rawValue: savedList) {
             currentWordList = listType
         }
         // Load letter color preference
-        if let savedColor = UserDefaults.standard.string(forKey: letterColorKey),
+        if let savedColor = defaults.string(forKey: letterColorKey),
            let colorType = LetterColor(rawValue: savedColor) {
             letterColor = colorType
         }
         isSoundEnabled = soundEffects.soundEnabled
-        _ = lexicon.load(wordList: currentWordList)
+        if !lexicon.load(wordList: currentWordList) {
+            loadError = "WORD LIST UNAVAILABLE - TRY SETTINGS"
+        }
         loadHighScores()
-        startCursorBlink()
+        if blinkCursor { startCursorBlink() }
         showTitleScreen()
     }
 
     private func startCursorBlink() {
         cursorTimer?.invalidate()
         cursorTimer = Timer.scheduledTimer(withTimeInterval: 0.4, repeats: true) { [weak self] _ in
-            self?.cursorVisible.toggle()
-            if self?.gameMode == .playing && self?.isPaused != true {
-                self?.refreshGameDisplay()
+            MainActor.assumeIsolated {
+                guard let self, self.gameMode == .playing, !self.isPaused, self.flashOverlay == .none else { return }
+                self.cursorVisible.toggle()
+                self.refreshGameDisplay()
             }
         }
     }
@@ -128,7 +156,7 @@ class GameEngine: ObservableObject {
     // MARK: - High Scores
 
     private func loadHighScores() {
-        if let data = UserDefaults.standard.data(forKey: highScoresKey),
+        if let data = defaults.data(forKey: highScoresKey),
            let scores = try? JSONDecoder().decode([HighScoreEntry].self, from: data) {
             highScores = scores
         }
@@ -136,7 +164,7 @@ class GameEngine: ObservableObject {
 
     private func saveHighScores() {
         if let data = try? JSONEncoder().encode(highScores) {
-            UserDefaults.standard.set(data, forKey: highScoresKey)
+            defaults.set(data, forKey: highScoresKey)
         }
     }
 
@@ -160,21 +188,29 @@ class GameEngine: ObservableObject {
     func resetHighScores() {
         highScores.removeAll()
         saveHighScores()
+        if gameMode == .highScoreList {
+            showHighScoreList(fromReveal: cameFromRevealScreen)
+        }
     }
 
     // MARK: - Word List Management
 
     func switchWordList(to listType: WordListType) {
         guard gameMode == .titleScreen else { return }  // Only allow switching from title screen
+        guard lexicon.switchWordList(to: listType) else {
+            loadError = "WORD LIST UNAVAILABLE - TRY SETTINGS"
+            showTitleScreen()
+            return
+        }
         currentWordList = listType
-        UserDefaults.standard.set(listType.rawValue, forKey: wordListKey)
-        _ = lexicon.switchWordList(to: listType)
+        loadError = nil
+        defaults.set(listType.rawValue, forKey: wordListKey)
         showTitleScreen()  // Refresh to show any changes
     }
 
     func switchLetterColor(to color: LetterColor) {
         letterColor = color
-        UserDefaults.standard.set(color.rawValue, forKey: letterColorKey)
+        defaults.set(color.rawValue, forKey: letterColorKey)
     }
 
     func toggleSound() {
@@ -215,6 +251,7 @@ class GameEngine: ObservableObject {
     private func showDebugHelp() {
         flashOverlay = .debugHelp
         clearBuffer()
+        defer { publishBuffer() }
 
         writeString(String(repeating: "+", count: Self.bufferCols), row: 0, col: 0)
         writeCentered("+++ DEBUG MODE ACTIVE +++", row: 1)
@@ -252,6 +289,11 @@ class GameEngine: ObservableObject {
 
         // Start/restart round with these letters
         stopTimer()
+        invalidateTransientDisplays()
+        isPaused = false
+        hintUsed = false
+        hintBingoWord = nil
+        hintRevealedPositions.removeAll()
         pool = testLetters
         pool.shuffle()
         poolDisplay = pool
@@ -291,8 +333,9 @@ class GameEngine: ObservableObject {
         for (_, length) in allValidWords {
             totalPoints += scoreForWord(length: length)
         }
+        let previousRoundScore = roundScore
         roundScore = totalPoints
-        score += totalPoints
+        score += totalPoints - previousRoundScore
 
         // Stop timer and show WOW screen
         stopTimer()
@@ -315,8 +358,7 @@ class GameEngine: ObservableObject {
         roundScore += points
 
         // Apply time bonus (+21 seconds, shown as +20)
-        timeLeft += 21
-        timeBonusDisplay = "+20"
+        applyTimeBonus(seconds: 21, displayAs: "+20")
 
         // Show bingo flash and fanfare
         soundEffects.playBingoFanfare()
@@ -325,20 +367,7 @@ class GameEngine: ObservableObject {
         statusMessage = "* BINGO! \"\(bingo)\" +\(points) PTS *"
         refreshGameDisplay()
 
-        // Clear time bonus display after delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
-            self?.timeBonusDisplay = nil
-            self?.refreshGameDisplay()
-        }
-
-        // Clear status message after delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
-            guard let self = self else { return }
-            if self.statusMessage.contains(bingo) {
-                self.statusMessage = ""
-                self.refreshGameDisplay()
-            }
-        }
+        setStatusMessage(statusMessage)
     }
 
     /// Debug function to start stress test mode (Ctrl+Cmd+Opt+X)
@@ -431,10 +460,11 @@ class GameEngine: ObservableObject {
 
     func startNewRound() {
         stopTimer()
+        invalidateTransientDisplays()
 
         guard let word = lexicon.getRandomSevenLetterWord() else {
-            statusMessage = "* NO 7-LETTER WORDS FOUND *"
-            refreshGameDisplay()
+            loadError = "WORD LIST UNAVAILABLE - TRY SETTINGS"
+            showTitleScreen()
             return
         }
 
@@ -477,6 +507,10 @@ class GameEngine: ObservableObject {
             // Do nothing - use CMD-Q to quit from title screen
             break
         case .playing:
+            if flashOverlay == .wow {
+                dismissWowScreen()
+                return
+            }
             // If paused, second ESC ends the round
             if isPaused {
                 isPaused = false
@@ -486,7 +520,6 @@ class GameEngine: ObservableObject {
             // Dismiss flash screens if showing
             if flashOverlay != .none {
                 flashOverlay = .none
-                savedBuffer = nil
             }
             // First ESC pauses the game
             isPaused = true
@@ -511,6 +544,7 @@ class GameEngine: ObservableObject {
 
     func showRevealScreen() {
         stopTimer()
+        invalidateTransientDisplays()
         isPaused = false
         gameMode = .revealing
         revealScrollOffset = 0
@@ -539,9 +573,11 @@ class GameEngine: ObservableObject {
     }
 
     private func startTimer() {
+        let activeRound = roundID
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            DispatchQueue.main.async {
-                self?.tick()
+            MainActor.assumeIsolated {
+                guard let self, self.roundID == activeRound else { return }
+                self.tick()
             }
         }
         RunLoop.main.add(timer!, forMode: .common)

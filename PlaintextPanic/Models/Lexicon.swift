@@ -30,29 +30,43 @@ class Lexicon {
 
     var wordCount: Int { words.count }
 
-    init() {}
+    private let resourceBundle: Bundle
+
+    init(resourceBundle: Bundle = .main) { self.resourceBundle = resourceBundle }
 
     func load(wordList: WordListType = .full) -> Bool {
+        // Keep the working dictionary intact until the replacement is usable.
+        let candidate = Lexicon(resourceBundle: resourceBundle)
+        guard candidate.loadContents(wordList: wordList), !candidate.sevenLetterWords.isEmpty else { return false }
+        words = candidate.words
+        definitions = candidate.definitions
+        sevenLetterWords = candidate.sevenLetterWords
+        anagramGroups = candidate.anagramGroups
+        currentWordList = wordList
+        return true
+    }
+
+    private func loadContents(wordList: WordListType) -> Bool {
         currentWordList = wordList
         let filename = wordList.filename
 
         // Try .gz file first (compressed format for distribution)
-        if let url = Bundle.main.url(forResource: filename, withExtension: "gz") {
+        if let url = resourceBundle.url(forResource: filename, withExtension: "gz") {
             return loadCompressedFile(at: url)
         }
 
         // Fall back to Resources/WordLists directory for .gz
-        let gzPath = Bundle.main.bundlePath + "/Contents/Resources/WordLists/\(filename).gz"
+        let gzPath = resourceBundle.bundlePath + "/Contents/Resources/WordLists/\(filename).gz"
         if FileManager.default.fileExists(atPath: gzPath) {
             return loadCompressedFile(at: URL(fileURLWithPath: gzPath))
         }
 
         // Fall back to .txt for development
-        if let url = Bundle.main.url(forResource: filename, withExtension: "txt") {
+        if let url = resourceBundle.url(forResource: filename, withExtension: "txt") {
             return loadFile(at: url)
         }
 
-        let txtPath = Bundle.main.bundlePath + "/Contents/Resources/WordLists/\(filename).txt"
+        let txtPath = resourceBundle.bundlePath + "/Contents/Resources/WordLists/\(filename).txt"
         if FileManager.default.fileExists(atPath: txtPath) {
             return loadFile(at: URL(fileURLWithPath: txtPath))
         }
@@ -118,6 +132,8 @@ class Lexicon {
                               Int(data[sizeOffset + 2]) << 16 |
                               Int(data[sizeOffset + 3]) << 24
 
+        guard uncompressedSize > 0, uncompressedSize <= 16 * 1024 * 1024 else { return nil }
+
         // Allocate buffer for decompressed data
         var destBuffer = [UInt8](repeating: 0, count: uncompressedSize)
 
@@ -134,7 +150,7 @@ class Lexicon {
             }
         }
 
-        guard result > 0 else { return nil }
+        guard result == uncompressedSize else { return nil }
         return Data(destBuffer.prefix(result))
     }
 

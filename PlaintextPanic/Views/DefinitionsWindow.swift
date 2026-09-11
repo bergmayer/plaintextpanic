@@ -73,7 +73,7 @@ struct WordContentRow: View {
     }
 
     private var mainDefinition: String {
-        guard let stem = stemReference,
+        guard stemReference != nil,
               let commaIndex = definition.firstIndex(of: ",") else {
             return definition
         }
@@ -128,7 +128,7 @@ struct DefinitionsWindow: View {
     let foundWords: Set<String>
     let lexicon: Lexicon
 
-    @Environment(\.dismiss) private var dismiss
+    let onClose: () -> Void
 
     private var wordsByLength: [(Int, [WordWithDefinition])] {
         var grouped: [Int: [WordWithDefinition]] = [:]
@@ -210,7 +210,7 @@ struct DefinitionsWindow: View {
             .shadow(color: Color.black.opacity(0.3), radius: 8, x: 0, y: 4)
             // Hidden button for ESC key handling
             .background(
-                Button("") { dismiss() }
+                Button("") { onClose() }
                     .keyboardShortcut(.escape, modifiers: [])
                     .opacity(0)
             )
@@ -257,7 +257,7 @@ class DefinitionsWindowController: NSObject, NSWindowDelegate {
             performSafeClose()
         }
 
-        let contentView = DefinitionsWindow(words: words, foundWords: foundWords, lexicon: lexicon)
+        let contentView = DefinitionsWindow(words: words, foundWords: foundWords, lexicon: lexicon, onClose: { [weak self] in self?.close() })
         let hosting = NSHostingController(rootView: contentView)
         hostingController = hosting
 

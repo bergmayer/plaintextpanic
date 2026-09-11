@@ -95,7 +95,7 @@ struct HelpLogoRow: View {
 // MARK: - Help Window View
 
 struct HelpWindow: View {
-    @Environment(\.dismiss) private var dismiss
+    let onClose: () -> Void
 
     // Help content as rows
     // Time Bonuses moved to be right after Rounds & Timing
@@ -109,7 +109,8 @@ struct HelpWindow: View {
         (.separator, ""),
         (.section, "ROUNDS & TIMING"),
         (.text, "Each round lasts 2 minutes."),
-        (.text, "Score enough points to advance."),
+        (.text, "Meet the target or find every word"),
+        (.text, "to advance to the next round."),
         (.text, "The target starts at 400 and increases"),
         (.text, "by 25 each round, up to a max of 525."),
         (.text, "The game ends when you miss the target."),
@@ -148,15 +149,16 @@ struct HelpWindow: View {
         (.text, "3 letters of an unfound bingo word."),
         (.text, "The first, last, and one random"),
         (.text, "middle letter are shown."),
+        (.text, "All remaining bingos earn half points."),
         (.empty, ""),
         (.separator, ""),
         (.section, "SOUND"),
         (.text, "Retro sound effects can be toggled"),
-        (.text, "from the View menu."),
+        (.text, "in Settings."),
         (.empty, ""),
         (.separator, ""),
         (.section, "WORD LIST"),
-        (.text, "Two options (change from menu):"),
+        (.text, "Two options (change in Settings):"),
         (.empty, ""),
         (.text, "  Full NASPA Word List (default)"),
         (.text, "    All 25,473 tournament 7-letter words"),
@@ -214,7 +216,7 @@ struct HelpWindow: View {
             .background(Color(red: 0.2, green: 0.2, blue: 0.2))
             .shadow(color: Color.black.opacity(0.3), radius: 8, x: 0, y: 4)
             .background(
-                Button("") { dismiss() }
+                Button("") { onClose() }
                     .keyboardShortcut(.escape, modifiers: [])
                     .opacity(0)
             )
@@ -264,7 +266,7 @@ class HelpWindowController: NSObject, NSWindowDelegate {
             performSafeClose()
         }
 
-        let contentView = HelpWindow()
+        let contentView = HelpWindow(onClose: { [weak self] in self?.close() })
         let hosting = NSHostingController(rootView: contentView)
         hostingController = hosting
 

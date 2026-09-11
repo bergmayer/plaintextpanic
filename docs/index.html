@@ -10,7 +10,7 @@
         // ============================================================
         const DOWNLOAD_LINKS = {
             dmg: "https://github.com/bergmayer/plaintextpanic/releases/latest/download/PlaintextPanic.dmg",
-            appStore: ""       // Mac App Store URL (leave empty to hide button)
+            appStore: "https://apps.apple.com/us/app/plaintext-panic/id6756894727?mt=12"
         };
         // ============================================================
     </script>
@@ -190,28 +190,6 @@
             background: rgba(51, 255, 51, 0.03);
         }
 
-        .terminal-theme .download-btn {
-            color: var(--terminal-black);
-            background: var(--phosphor-green);
-            box-shadow: 0 0 20px var(--phosphor-glow);
-        }
-
-        .terminal-theme .download-btn:hover {
-            background: #44ff44;
-            box-shadow: 0 0 30px var(--phosphor-glow), 0 0 50px rgba(51, 255, 51, 0.3);
-        }
-
-        .terminal-theme .download-btn.secondary {
-            background: transparent;
-            color: var(--phosphor-green);
-            border-color: var(--phosphor-green);
-            box-shadow: none;
-        }
-
-        .terminal-theme .download-btn.secondary:hover {
-            background: rgba(51, 255, 51, 0.1);
-            box-shadow: 0 0 20px var(--phosphor-glow);
-        }
 
         .terminal-theme .requirements,
         .terminal-theme .coming-soon {
@@ -414,28 +392,6 @@
             background: rgba(144, 238, 144, 0.1);
         }
 
-        .dotmatrix-theme .download-btn {
-            color: var(--paper-white);
-            background: var(--ink-color);
-            box-shadow: 2px 2px 0 var(--ink-dim);
-        }
-
-        .dotmatrix-theme .download-btn:hover {
-            background: #1a1a1a;
-            box-shadow: 3px 3px 0 var(--ink-dim);
-            transform: translate(-1px, -1px);
-        }
-
-        .dotmatrix-theme .download-btn.secondary {
-            background: transparent;
-            color: var(--ink-color);
-            border: 2px solid var(--ink-color);
-            box-shadow: none;
-        }
-
-        .dotmatrix-theme .download-btn.secondary:hover {
-            background: rgba(0, 0, 0, 0.05);
-        }
 
         .dotmatrix-theme .requirements,
         .dotmatrix-theme .coming-soon {
@@ -495,8 +451,8 @@
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
+            margin-bottom: 0;
+            padding-bottom: 5px;
         }
 
         .title {
@@ -644,25 +600,43 @@
         .download-buttons {
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
+            gap: 30px;
             justify-content: center;
             margin-bottom: 15px;
         }
 
         .download-btn {
-            display: inline-block;
-            padding: 15px 40px;
-            font-family: inherit;
-            font-size: 1.1em;
-            border: none;
-            border-radius: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
             text-decoration: none;
             cursor: pointer;
             transition: all 0.2s;
         }
 
-        .download-btn.secondary {
-            border: 2px solid;
+        .download-btn img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            transition: transform 0.2s;
+        }
+
+        .download-btn:hover img {
+            transform: scale(1.1);
+        }
+
+        .download-btn .label {
+            font-family: inherit;
+            font-size: 0.9em;
+        }
+
+        .terminal-theme .download-btn .label {
+            color: var(--phosphor-green);
+        }
+
+        .dotmatrix-theme .download-btn .label {
+            color: var(--ink-color);
         }
 
         .requirements {
@@ -757,7 +731,7 @@
             line-height: 1.2;
             white-space: pre;
             text-align: center;
-            margin: 20px 0;
+            margin: 0 0 20px;
         }
 
         /* Theme Toggle */
@@ -921,10 +895,11 @@
                     <section class="section">
                         <h2 class="section-title glow">FEATURES</h2>
                         <ul class="features">
-                            <li>CRT monitor effects</li>
+                            <li>CRT monitor effects, retro sound, and green, amber, or white phosphor colors</li>
                             <li>Uses the official NASPA tournament word list (NWL 2023)</li>
-                            <li>Two word list options: Full NASPA (25,473 seven-letter words) or Common 7-Letter Words (5,060 recognizable words)</li>
+                            <li>Full NASPA or Common 7-Letter Words options</li>
                             <li>Time bonuses for longer words</li>
+                            <li>One bingo hint per round; Escape pauses and hides the board</li>
                             <li>View definitions for all possible words after each round</li>
                         </ul>
                     </section>
@@ -933,11 +908,14 @@
                     <section class="section">
                         <h2 class="section-title glow">SCREENSHOTS</h2>
                         <div class="screenshots">
-                            <div class="screenshot-container" onclick="openLightbox('_plaintextpanic_gameplay.png')">
-                                <img src="_plaintextpanic_gameplay.png" alt="Gameplay" onerror="this.style.display='none'; this.parentElement.innerHTML='[ GAMEPLAY SCREENSHOT ]';">
+                            <div class="screenshot-container" onclick="openLightbox('_plaintextpanic_title.png?v=1.3')">
+                                <img src="_plaintextpanic_title.png?v=1.3" alt="Title screen and scoring rules">
                             </div>
-                            <div class="screenshot-container" onclick="openLightbox('_plaintextpanic_definitions.png')">
-                                <img src="_plaintextpanic_definitions.png" alt="Definitions" onerror="this.style.display='none'; this.parentElement.innerHTML='[ DEFINITIONS SCREENSHOT ]';">
+                            <div class="screenshot-container" onclick="openLightbox('_plaintextpanic_gameplay.png?v=1.3')">
+                                <img src="_plaintextpanic_gameplay.png?v=1.3" alt="Gameplay" onerror="this.style.display='none'; this.parentElement.innerHTML='[ GAMEPLAY SCREENSHOT ]';">
+                            </div>
+                            <div class="screenshot-container" onclick="openLightbox('_plaintextpanic_definitions.png?v=1.3')">
+                                <img src="_plaintextpanic_definitions.png?v=1.3" alt="Definitions" onerror="this.style.display='none'; this.parentElement.innerHTML='[ DEFINITIONS SCREENSHOT ]';">
                             </div>
                         </div>
                     </section>
@@ -952,7 +930,10 @@
                             <tr><td>6-letter words</td><td>200 pts + 10 sec</td></tr>
                             <tr><td>7-letter BINGO</td><td>300 pts + 20 sec</td></tr>
                         </table>
-                        <p>Score 450+ points each round to continue to the next level!</p>
+                        <p>Score enough points each round to advance! The target starts
+                            at 400 and increases by 25 each round, up to a maximum of 525. In version 1.3, finding every possible word also advances the round.</p>
+                        <p>Press Tab once per round to reveal three letters of an unfound bingo. After using a hint, all remaining bingos earn half points.</p>
+                        <p>Version 1.3 has been submitted to Apple for review.</p>
                     </section>
 
                     <!-- Download -->
@@ -975,13 +956,16 @@
                             The copy included in this app is licensed for personal use.<br>
                             You may not use it for any commercial purposes.
                         </div>
+                        <div class="naspa-title" style="margin-top: 10px;">
+                            <a href="https://www.scrabbleplayers.org/landing/plaintextpanic/" target="_blank" class="naspa-link">Support NASPA</a>
+                        </div>
                     </section>
 
                     <!-- Privacy Policy -->
                     <section class="section" id="privacy">
                         <h2 class="section-title glow">PRIVACY POLICY</h2>
                         <p>
-                            Plaintext Panic does not collect, store, or transmit any personal data.
+                            Plaintext Panic does not collect or transmit personal data. High scores and preferences stay on your Mac.
                         </p>
                     </section>
 
@@ -990,8 +974,6 @@
                         <p>&copy; 2025 John Bergmayer &bull; Licensed under GPL 3.0</p>
                         <p>
                             <a href="https://github.com/bergmayer/plaintextpanic">View on GitHub</a>
-                            &bull;
-                            <a href="#privacy">Privacy Policy</a>
                         </p>
 
                         <!-- Theme Toggle -->
@@ -1037,8 +1019,8 @@
                 themeSwitch.classList.add('dotmatrix');
             }
 
-            // Save preference
-            localStorage.setItem('theme', theme);
+            // Save preference (use unique key to avoid conflict with main site)
+            localStorage.setItem('plaintextpanic-theme', theme);
         }
 
         function toggleTheme() {
@@ -1048,11 +1030,12 @@
 
         // Initialize download buttons based on configured links
         document.addEventListener('DOMContentLoaded', function() {
-            // Load saved theme preference
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme) {
+            // Load saved theme preference (use unique key to avoid conflict with main site)
+            const savedTheme = localStorage.getItem('plaintextpanic-theme');
+            if (savedTheme === 'terminal' || savedTheme === 'dotmatrix') {
                 setTheme(savedTheme);
             }
+            // If no saved preference or invalid value, Terminal is default (set in HTML)
 
             const buttonsContainer = document.getElementById('download-buttons');
             let hasButtons = false;
@@ -1060,8 +1043,8 @@
             if (DOWNLOAD_LINKS.dmg) {
                 const dmgBtn = document.createElement('a');
                 dmgBtn.href = DOWNLOAD_LINKS.dmg;
-                dmgBtn.className = 'download-btn glow';
-                dmgBtn.textContent = 'DOWNLOAD DMG';
+                dmgBtn.className = 'download-btn';
+                dmgBtn.innerHTML = '<img src="_disk_image.png" alt="Download DMG"><span class="label">Direct Download</span>';
                 buttonsContainer.appendChild(dmgBtn);
                 hasButtons = true;
             }
@@ -1069,8 +1052,8 @@
             if (DOWNLOAD_LINKS.appStore) {
                 const appStoreBtn = document.createElement('a');
                 appStoreBtn.href = DOWNLOAD_LINKS.appStore;
-                appStoreBtn.className = 'download-btn' + (DOWNLOAD_LINKS.dmg ? ' secondary' : ' glow');
-                appStoreBtn.textContent = 'MAC APP STORE';
+                appStoreBtn.className = 'download-btn';
+                appStoreBtn.innerHTML = '<img src="_Mac_App_Store.png" alt="Mac App Store"><span class="label">Mac App Store</span>';
                 appStoreBtn.target = '_blank';
                 buttonsContainer.appendChild(appStoreBtn);
                 hasButtons = true;

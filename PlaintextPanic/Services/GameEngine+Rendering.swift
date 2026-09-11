@@ -8,12 +8,11 @@ extension GameEngine {
     // MARK: - Buffer Management
 
     func clearBuffer() {
-        objectWillChange.send()
-        for row in 0..<Self.bufferRows {
-            for col in 0..<Self.bufferCols {
-                buffer[row][col] = " "
-            }
-        }
+        drawingBuffer = Array(repeating: Array(repeating: " ", count: Self.bufferCols), count: Self.bufferRows)
+    }
+
+    func publishBuffer() {
+        if buffer != drawingBuffer { buffer = drawingBuffer }
     }
 
     func writeString(_ text: String, row: Int, col: Int) {
@@ -21,7 +20,7 @@ extension GameEngine {
         var currentCol = col
         for char in text {
             guard currentCol >= 0 && currentCol < Self.bufferCols else { break }
-            buffer[row][currentCol] = char
+            drawingBuffer[row][currentCol] = char
             currentCol += 1
         }
     }
@@ -35,11 +34,13 @@ extension GameEngine {
 
     func showTitleScreen() {
         stopTimer()
+        invalidateTransientDisplays()
         #if DEBUG
         isStressTestMode = false
         #endif
         gameMode = .titleScreen
         clearBuffer()
+        defer { publishBuffer() }
 
         writeString(String(repeating: "+", count: Self.bufferCols), row: 0, col: 0)
         writeCentered("PLAINTEXT PANIC", row: 1)
@@ -49,7 +50,7 @@ extension GameEngine {
         writeCentered("EACH ROUND IS 2 MINUTES", row: 5)
         writeCentered("TIME BONUS FOR 5, 6, AND 7-LETTER WORDS", row: 6)
         writeCentered("FIND THE 7-LETTER BINGO", row: 7)
-        writeCentered("MEET THE POINT TARGET TO CONTINUE!", row: 8)
+        writeCentered("MEET TARGET OR FIND EVERY WORD!", row: 8)
 
         writeString(String(repeating: "-", count: Self.bufferCols), row: 10, col: 0)
         writeCentered("SCORING:", row: 11)
@@ -63,13 +64,15 @@ extension GameEngine {
 
         writeCentered("[ENTER] START   [H] HIGH SCORES", row: 18)
         writeCentered("[CMD-Q] QUIT", row: 19)
+        if let loadError { writeCentered(loadError, row: 23) }
     }
 
     func refreshGameDisplay() {
         // Don't refresh if showing a flash screen
-        guard flashOverlay == .none else { return }
+        guard gameMode == .playing, !isPaused, flashOverlay == .none else { return }
 
         clearBuffer()
+        defer { publishBuffer() }
 
         // Line 0-2: Title
         writeString(String(repeating: "+", count: Self.bufferCols), row: 0, col: 0)
@@ -125,6 +128,7 @@ extension GameEngine {
 
     func refreshRevealDisplay() {
         clearBuffer()
+        defer { publishBuffer() }
 
         // Line 0-2: Title
         writeString(String(repeating: "+", count: Self.bufferCols), row: 0, col: 0)
@@ -160,7 +164,7 @@ extension GameEngine {
         }
 
         // Line 22-23: Instructions based on score
-        if roundScore >= minScoreRequired {
+        if canAdvance {
             writeCentered("[ENTER] NEXT ROUND   [D] DEFINITIONS", row: 22)
         } else {
             writeCentered("NOT ENOUGH POINTS   [D] DEFINITIONS", row: 22)
@@ -170,15 +174,16 @@ extension GameEngine {
 
     func showPausedScreen() {
         clearBuffer()
+        defer { publishBuffer() }
         writeString(String(repeating: "+", count: Self.bufferCols), row: 0, col: 0)
         writeString(String(repeating: "+", count: Self.bufferCols), row: 23, col: 0)
         writeCentered("PAUSED", row: 11)
         writeCentered("[ESC] END ROUND   [ANY KEY] RESUME", row: 13)
-        objectWillChange.send()
     }
 
     func showHighScoreEntryScreen() {
         clearBuffer()
+        defer { publishBuffer() }
         writeString(String(repeating: "+", count: Self.bufferCols), row: 0, col: 0)
         writeCentered("NEW HIGH SCORE!", row: 1)
         writeString(String(repeating: "+", count: Self.bufferCols), row: 2, col: 0)
@@ -203,6 +208,7 @@ extension GameEngine {
         cameFromRevealScreen = fromReveal
         gameMode = .highScoreList
         clearBuffer()
+        defer { publishBuffer() }
         writeString(String(repeating: "+", count: Self.bufferCols), row: 0, col: 0)
         writeCentered("HIGH SCORES", row: 1)
         writeString(String(repeating: "+", count: Self.bufferCols), row: 2, col: 0)
@@ -318,7 +324,7 @@ extension GameEngine {
         func remainingBelow(_ displayList: [String]) -> Int {
             let lastVisibleIdx = offset + maxRows - 1
             if displayList.count > lastVisibleIdx + 1 {
-                return displayList.count - lastVisibleIdx - 1
+                return displayList.count - lastVisibleIdx
             }
             return 0
         }
@@ -578,12 +584,11 @@ extension GameEngine {
     // MARK: - Flash Screens
 
     func triggerBingoFlash(hintPenalty: Bool = false) {
-        // Save current buffer (deep copy)
-        savedBuffer = buffer.map { $0 }
         flashOverlay = .bingo
 
         // Render BINGO to buffer
         clearBuffer()
+        defer { publishBuffer() }
 
         // Add edge content so barrel distortion is visible
         // (distortion is minimal at center, maximal at edges)
@@ -606,27 +611,21 @@ extension GameEngine {
             writeCentered("(HINT USED: HALF POINTS)", row: 16)
         }
 
-        // Force view update after all writes
-        objectWillChange.send()
-
-        // Restore after 1 second
+        // Redraw current state instead of restoring a stale pre-submission frame.
+        let activeFlash = UUID()
+        flashID = activeFlash
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-            guard let self = self, self.flashOverlay == .bingo else { return }
+            guard let self, self.flashID == activeFlash, self.flashOverlay == .bingo else { return }
             self.flashOverlay = .none
-            if let saved = self.savedBuffer {
-                self.buffer = saved.map { $0 }
-                self.savedBuffer = nil
-                self.objectWillChange.send()
-            }
+            self.refreshGameDisplay()
         }
     }
 
     func showWowScreen() {
-        // Save current buffer (deep copy) and show WOW screen
-        savedBuffer = buffer.map { $0 }
         flashOverlay = .wow
 
         clearBuffer()
+        defer { publishBuffer() }
 
         // Add edge content so barrel distortion is visible
         // (distortion is minimal at center, maximal at edges)
@@ -646,14 +645,10 @@ extension GameEngine {
         }
         writeCentered("YOU FOUND EVERY WORD!", row: 15)
         writeCentered("[ENTER] CONTINUE", row: 17)
-
-        // Force view update after all writes
-        objectWillChange.send()
     }
 
     func dismissWowScreen() {
         flashOverlay = .none
-        savedBuffer = nil  // Don't restore - we're going to reveal screen
         showRevealScreen()
     }
 
@@ -663,19 +658,24 @@ extension GameEngine {
         timeLeft += seconds
         timeBonusDisplay = displayAs
         refreshGameDisplay()
+        let activeBonus = UUID()
+        bonusID = activeBonus
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) { [weak self] in
-            self?.timeBonusDisplay = nil
-            self?.refreshGameDisplay()
+            guard let self, self.bonusID == activeBonus else { return }
+            self.timeBonusDisplay = nil
+            self.refreshGameDisplay()
         }
     }
 
     func setStatusMessage(_ message: String, clearAfter seconds: Double = 2.0) {
         statusMessage = message
         refreshGameDisplay()
+        let activeStatus = UUID()
+        statusID = activeStatus
         DispatchQueue.main.asyncAfter(deadline: .now() + seconds) { [weak self] in
             guard let self = self else { return }
-            // Only clear if it's still the same message (avoid clearing newer messages)
-            if self.statusMessage == message {
+            // A newer message, even with identical text, owns its own lifetime.
+            if self.statusID == activeStatus {
                 self.statusMessage = ""
                 self.refreshGameDisplay()
             }

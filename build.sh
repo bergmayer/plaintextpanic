@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Build script for Plaintext Panic
-# Usage: ./build.sh [debug|release|clean]
+# Usage: ./build.sh [debug|release|clean|run]
 
 set -e
 
@@ -56,6 +56,10 @@ create_app_icon() {
 }
 
 case "${1:-debug}" in
+    run)
+        "$0" debug
+        open "$DERIVED_DATA/Build/Products/Debug/PlaintextPanic.app"
+        ;;
     debug)
         echo "Building Debug configuration..."
         xcodebuild \
@@ -102,12 +106,13 @@ case "${1:-debug}" in
         ;;
 
     *)
-        echo "Usage: $0 [debug|release|clean]"
+        echo "Usage: $0 [debug|release|clean|run]"
         echo ""
         echo "Commands:"
         echo "  debug   - Build debug configuration (default)"
         echo "  release - Build release configuration"
         echo "  clean   - Clean build artifacts"
+        echo "  run     - Build debug and launch"
         exit 1
         ;;
 esac
