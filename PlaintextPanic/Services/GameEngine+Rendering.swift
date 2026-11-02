@@ -69,7 +69,7 @@ extension GameEngine {
 
     func refreshGameDisplay() {
         // Don't refresh if showing a flash screen
-        guard gameMode == .playing, !isPaused, flashOverlay == .none else { return }
+        guard gameMode == .playing, flashOverlay == .none else { return }
 
         clearBuffer()
         defer { publishBuffer() }

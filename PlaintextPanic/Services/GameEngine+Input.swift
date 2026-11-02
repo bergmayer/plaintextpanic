@@ -81,7 +81,7 @@ extension GameEngine {
 
         // Playing - but first check if paused or flash screens are showing
         if isPaused {
-            isPaused = false
+            gameMode = .playing
             refreshGameDisplay()
             return
         }
@@ -128,7 +128,7 @@ extension GameEngine {
     }
 
     func handleHint() {
-        guard gameMode == .playing, !isPaused else { return }
+        guard gameMode == .playing else { return }
         guard flashOverlay == .none else { return }
 
         // Check if all bingos already found
@@ -164,7 +164,7 @@ extension GameEngine {
     }
 
     func handleArrowKey(isUp: Bool) {
-        if gameMode == .playing, !isPaused {
+        if gameMode == .playing {
             if isUp {
                 if gameScrollOffset > 0 {
                     gameScrollOffset -= 1
@@ -197,7 +197,7 @@ extension GameEngine {
         let maxVisibleGameplay = 5
         let maxVisibleReveal = 9
 
-        if gameMode == .playing, !isPaused {
+        if gameMode == .playing {
             guard bingoWords.count > maxVisibleGameplay else { return }
             let maxOffset = max(0, bingoWords.count - 4)  // Show 4 bingos + "+X MORE"
 

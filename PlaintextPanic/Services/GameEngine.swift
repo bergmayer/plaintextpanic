@@ -5,6 +5,7 @@ import Combine
 enum GameMode {
     case titleScreen
     case playing
+    case paused
     case revealing  // Shows all words after round ends
     case gameOver
     case highScoreEntry  // Entering initials for high score
@@ -100,7 +101,7 @@ class GameEngine: ObservableObject {
     let isStressTestMode: Bool = false  // Always false in release builds
     #endif
     var highScoreInitials: String = ""  // Initials being entered for high score
-    var isPaused: Bool = false  // Game paused during play
+    var isPaused: Bool { gameMode == .paused }
     var hintUsed: Bool = false  // Whether bingo hint has been used this round
     var hintBingoWord: String? = nil  // The bingo word being hinted
     var hintRevealedPositions: Set<Int> = []  // Which letter positions are revealed
@@ -146,7 +147,7 @@ class GameEngine: ObservableObject {
         cursorTimer?.invalidate()
         cursorTimer = Timer.scheduledTimer(withTimeInterval: 0.4, repeats: true) { [weak self] _ in
             MainActor.assumeIsolated {
-                guard let self, self.gameMode == .playing, !self.isPaused, self.flashOverlay == .none else { return }
+                guard let self, self.gameMode == .playing, self.flashOverlay == .none else { return }
                 self.cursorVisible.toggle()
                 self.refreshGameDisplay()
             }
@@ -290,7 +291,6 @@ class GameEngine: ObservableObject {
         // Start/restart round with these letters
         stopTimer()
         invalidateTransientDisplays()
-        isPaused = false
         hintUsed = false
         hintBingoWord = nil
         hintRevealedPositions.removeAll()
@@ -484,7 +484,6 @@ class GameEngine: ObservableObject {
 
         timeLeft = 120
         statusMessage = ""
-        isPaused = false
         hintUsed = false
         hintBingoWord = nil
         hintRevealedPositions.removeAll()
@@ -511,19 +510,15 @@ class GameEngine: ObservableObject {
                 dismissWowScreen()
                 return
             }
-            // If paused, second ESC ends the round
-            if isPaused {
-                isPaused = false
-                showRevealScreen()
-                return
-            }
             // Dismiss flash screens if showing
             if flashOverlay != .none {
                 flashOverlay = .none
             }
             // First ESC pauses the game
-            isPaused = true
+            gameMode = .paused
             showPausedScreen()
+        case .paused:
+            showRevealScreen()
         case .revealing:
             // End the game, go to high score or title
             endGame()
@@ -545,7 +540,6 @@ class GameEngine: ObservableObject {
     func showRevealScreen() {
         stopTimer()
         invalidateTransientDisplays()
-        isPaused = false
         gameMode = .revealing
         revealScrollOffset = 0
         bingoScrollOffset = 0
@@ -589,7 +583,7 @@ class GameEngine: ObservableObject {
     }
 
     private func tick() {
-        guard gameMode == .playing, !isPaused else { return }
+        guard gameMode == .playing else { return }
 
         timeLeft -= 1
 

@@ -227,7 +227,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         // The pause prompt promises any key resumes, including Tab and arrows.
-        if engine.gameMode == .playing, engine.isPaused, !modifiers.contains(.command) {
+        if engine.gameMode == .paused, !modifiers.contains(.command) {
             engine.handleKeyPress(event.characters ?? "")
             return nil
         }
